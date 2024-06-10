@@ -1,3 +1,7 @@
+# 《数值计算方法》实验报告
+
+<center> 202200130119 于斐 </center>
+
 ## 第一章作业上机实验
 
 ### 求方程 $x^2 + (\alpha - \beta) x + 10^9 = 0$ 的根。其中 $\alpha = -10^9, \beta = -1$，讨论如何设计计算格式才能有效减少误差，提高运算精度。
@@ -21,7 +25,7 @@ x1, x2 = (-2 * c) / (b + (b ** 2 - 4 * a * c) ** 0.5) \
 print(x1, x2)
 ```
 
-### > 以计算 $x^{31}$ 为例，讨论如何设计计算格式才能减少计算次数。
+### 以计算 $x^{31}$ 为例，讨论如何设计计算格式才能减少计算次数。
 
 注意到例如 $31 = 2^0 + 2^1 + 2^2 + 2^3 + 2^4$，任何正整数均有唯一一个二进制拆分方式。
 
@@ -545,6 +549,82 @@ for h in hs:
 
 ### 求 $y' = 1 + y^2$，$y(0) = 0$ 的数值解（分别用欧拉显格式、梯形预估修正格式、4 阶龙格库塔格式，并与解析解比较这三种格式的收敛性。）
 
+首先求方程解析解，有 $$ \begin{aligned} \cfrac{\text{d} y}{\text{d} x} & = 1 + y^2 \\ \cfrac{1}{1 + y^2} \text{ d} y & = \text{d} x \\ \int \cfrac{1}{1 + y^2} \text{ d} y & = \int \text{d} x \\ \arctan (y) + C & = x \end{aligned} $$
+
+又 $y(0) = 0$，有 $C = 0 \Rightarrow y = \tan(x) $。
+
+![1718019290830](image/experiment/1718019290830.png)
+
+上图是欧拉显格式、梯形预估修正格式、4 阶龙格库塔格式在 $h = 0,1 0.01, 0.001$ 下对 $[0, \cfrac{5}{11} \pi]$ 这个区间内求解的结果。
+
+在三个 $h$ 取值下，4 阶龙格库塔格式都能够取得比较精确的结果，收敛。  
+在 $h = 0.1$ 时，欧拉显式方法最不精确，其次是梯形预估修正格式，二者均不收敛。  
+在 $h = 0.01$ 时，欧拉显式方法不收敛，梯形预估修正格式已经开始收敛。  
+在 $h = 0.001$ 时，二者都已经开始收敛。  
+
+Python 求解代码如下：
+
+```python
+def f(x: float, y: float) -> float:
+    return 1 + y ** 2
+
+def euler_explicit(f: callable, a: float, b: float, y0: float, h: float) -> list:
+    n = int(math.ceil((b - a) / h))
+    x, y = [a], [y0]
+    for i in range(1, n + 1):
+        x.append(a + i * h)
+        y.append(y[-1] + h * f(x[-1], y[-1]))
+    return x, y
+
+def trapezoidal_predictor_corrector(f: callable, a: float, b: float, y0: float, h: float) -> list:
+    n = int(math.ceil((b - a) / h))
+    x, y = [a], [y0]
+    for i in range(1, n + 1):
+        x.append(a + i * h)
+        y.append(y[-1] + h / 2 * (f(x[-1], y[-1]) + f(x[-1] + h, y[-1] + h * f(x[-1], y[-1]))))
+    return x, y
+
+def runge_kutta_4(f: callable, a: float, b: float, y0: float, h: float) -> list:
+    n = int(math.ceil((b - a) / h))
+    x, y = [a], [y0]
+    for i in range(1, n + 1):
+        x.append(a + i * h)
+        k1 = h * f(x[-1], y[-1])
+        k2 = h * f(x[-1] + h / 2, y[-1] + k1 / 2)
+        k3 = h * f(x[-1] + h / 2, y[-1] + k2 / 2)
+        k4 = h * f(x[-1] + h, y[-1] + k3)
+        y.append(y[-1] + (k1 + 2 * k2 + 2 * k3 + k4) / 6)
+    return x, y
+
+def exact_solution(x: float) -> float:
+    return math.tan(x)
+
+import matplotlib.pyplot as plt
+
+plt.style.use('seaborn-whitegrid')
+
+a, b, y0 = 0, math.pi * 5 / 11, 0
+
+hs = [0.1, 0.01, 0.001]
+fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+
+for i, h in enumerate(hs):
+    x, y = euler_explicit(f, a, b, y0, h)
+    ax[i].plot(x, y, label='euler_explicit', linestyle='dashed')
+    x, y = trapezoidal_predictor_corrector(f, a, b, y0, h)
+    ax[i].plot(x, y, label='trapezoidal_predictor_corrector', linestyle='dashed')
+    x, y = runge_kutta_4(f, a, b, y0, h)
+    ax[i].plot(x, y, label='runge_kutta_4', linestyle='dashed')
+    x = [a + i * h for i in range(int(math.ceil((b - a) / h)) + 1)]
+    y = [exact_solution(x_) for x_ in x]
+    ax[i].plot(x, y, label='exact_solution')
+    ax[i].legend()
+    ax[i].title.set_text(f'h = {h}')
+
+plt.show()
+    
+```
+
 ### 用龙格库塔 4 阶方法求解描述振荡器的经典 van der Pol 微分方程，分别取 $\mu = 0.01, 0.1, 1$，作图比较计算结果。
 
 $$
@@ -554,6 +634,57 @@ y(0) = 1, y'(0) = 0
 \end{cases}
 $$
 
+首先将二阶微分方程转化为一阶微分方程组，令 $u_1(t) = \cfrac{\text{d} y}{\text{d} t}, u_2(t) = y(t)$，有 $$\begin{cases}
+u_1' = (\mu (1 - u_2^2) u_1) - u_2 \\
+u_2' = u_1
+\end{cases}$$
+
+初始时 $u_1 = 0, u_2 = 1$。再对这个方程组用 4 阶龙格库塔方法求解。结果如下图：
+
+![1718021156268](image/experiment/1718021156268.png)
+
+Python 求解代码如下：
+
+```python
+def u1_prime(t: float, u1: float, u2: float, mu: float) -> float:
+    return mu * (1 - u2 ** 2) * u1 - u2
+
+def u2_prime(t: float, u1: float, u2: float, mu: float) -> float:
+    return u1
+
+def runge_kutta_4_van_der_pol(mu: float, a: float, b: float, u1_0: float, u2_0: float, h: float) -> list:
+    n = int(math.ceil((b - a) / h))
+    t, u1, u2 = [a], [u1_0], [u2_0]
+    for i in range(1, n + 1):
+        t.append(a + i * h)
+        k1 = h * u1_prime(t[-1], u1[-1], u2[-1], mu)
+        l1 = h * u2_prime(t[-1], u1[-1], u2[-1], mu)
+        k2 = h * u1_prime(t[-1] + h / 2, u1[-1] + k1 / 2, u2[-1] + l1 / 2, mu)
+        l2 = h * u2_prime(t[-1] + h / 2, u1[-1] + k1 / 2, u2[-1] + l1 / 2, mu)
+        k3 = h * u1_prime(t[-1] + h / 2, u1[-1] + k2 / 2, u2[-1] + l2 / 2, mu)
+        l3 = h * u2_prime(t[-1] + h / 2, u1[-1] + k2 / 2, u2[-1] + l2 / 2, mu)
+        k4 = h * u1_prime(t[-1] + h, u1[-1] + k3, u2[-1] + l3, mu)
+        l4 = h * u2_prime(t[-1] + h, u1[-1] + k3, u2[-1] + l3, mu)
+        u1.append(u1[-1] + (k1 + 2 * k2 + 2 * k3 + k4) / 6)
+        u2.append(u2[-1] + (l1 + 2 * l2 + 2 * l3 + l4) / 6)
+    return t, u1, u2
+
+mu = [0.01, 0.1, 1]
+a, b, u1_0, u2_0 = 0, 20, 0, 1
+h = 0.01
+
+fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+
+for i in range(3):
+    t, u1, u2 = runge_kutta_4_van_der_pol(mu[i], a, b, u1_0, u2_0, h)
+    ax[i].plot(t, u1, label='u1')
+    ax[i].plot(t, u2, label='u2')
+    ax[i].title.set_text(f'mu = {mu[i]}')
+    ax[i].legend()
+
+plt.show()
+```
+
 ### 试用 Adams Fourth-Order Predictor-Corrector 格式，求解以下 ODE 的数值解（取 $h = 1, 0.5, 0.25, 0.125$）
 
 $$
@@ -562,6 +693,53 @@ $$
 y(0) = 1
 \end{cases}
 $$
+
+首先求解析解。在 Mathematica 中使用 `sol = DSolveValue[{y'[t] == (t - y[t]) / 2, y[0] == 1}, y[t], t]` 求得解析解为 $$y(t) = t - 2 + 3e^{-t / 2} $$
+
+Adams Fourth-Order Predictor-Corrector 格式求解结果如下：
+
+![1718022554858](image/experiment/1718022554858.png)
+
+Python 求解代码如下：
+
+```python
+def f(t: float, y: float) -> float:
+    return (t - y) / 2
+
+def exact_solution(t: float) -> float:
+    return t - 2 + 3 * math.exp(-t / 2)
+
+def adams_fourth_order_predictor_corrector(a: float, b: float, y0: float, h: float) -> list:
+    n = int(math.ceil((b - a) / h))
+    t, y = [a], [y0]
+    for i in range(1, 4):
+        t.append(a + i * h)
+        k1 = h * f(t[-1], y[-1])
+        k2 = h * f(t[-1] + h / 2, y[-1] + k1 / 2)
+        k3 = h * f(t[-1] + h / 2, y[-1] + k2 / 2)
+        k4 = h * f(t[-1] + h, y[-1] + k3)
+        y.append(y[-1] + (k1 + 2 * k2 + 2 * k3 + k4) / 6)
+    for i in range(4, n + 1):
+        t.append(a + i * h)
+        y.append(y[-1] + h / 24 * (55 * f(t[-1], y[-1]) - 59 * f(t[-2], y[-2]) + 37 * f(t[-3], y[-3]) - 9 * f(t[-4], y[-4])))
+    return t, y
+
+a, b, y0 = 0, 10, 1
+hs = [1, 0.5, 0.25, 0.125]
+
+fig, ax = plt.subplots(1, 4, figsize=(24, 6))
+
+for i, h in enumerate(hs):
+    t, y = adams_fourth_order_predictor_corrector(a, b, y0, h)
+    ax[i].plot(t, y, label='adams_fourth_order_predictor_corrector')
+    t = [a + i * h for i in range(int(math.ceil((b - a) / h)) + 1)]
+    y = [exact_solution(t_) for t_ in t]
+    ax[i].plot(t, y, label='exact_solution')
+    ax[i].title.set_text(f'h = {h}')
+    ax[i].legend()
+
+plt.show()
+```
 
 ## 第六、七章作业上机实验
 
@@ -578,6 +756,94 @@ $$
 1. 试用 LU 分解求解此方程组；
 2. 分别用 Jacobi, Gauss-Seidel 方法求解此方程组。
 
+LU 分解得到的矩阵如下：
+
+$$
+L = \begin{bmatrix}
+1 & 0 & 0 \\
+1 & 1 & 0 \\
+-0.5 & -0.071 & 1
+\end{bmatrix} \\ ~ \\
+R = \begin{bmatrix}
+4 & -1 & 1 \\
+0 & -7 & 0 \\ 
+0 & 0 & 5.5
+\end{bmatrix}
+$$
+
+在 tolerance 在 $10^{-6}$ 的情况下，求解结果如下：
+
+```plain
+LU: [2. 4. 3.]
+Jacobi: [1.99999932 3.99999975 3.00000035] with 15 iterations
+Gauss-Seidel: [1.99999964 3.99999976 2.9999999 ] with 9 iterations
+```
+
+Python 求解代码如下：
+
+```python
+A = np.array([[4, -1, 1], [4, -8, 1], [-2, 1, 5]])
+B = np.array([7, -21, 15])
+
+def lu_decomposition(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    n = len(A)
+    L = np.zeros((n, n))
+    U = np.zeros((n, n))
+    for i in range(n):
+        L[i][i] = 1
+        for j in range(i, n):
+            U[i][j] = A[i][j] - sum(L[i][k] * U[k][j] for k in range(i))
+        for j in range(i + 1, n):
+            L[j][i] = (A[j][i] - sum(L[j][k] * U[k][i] for k in range(i))) / U[i][i]
+    Y = np.zeros(n)
+    for i in range(n):
+        Y[i] = B[i] - sum(L[i][j] * Y[j] for j in range(i))
+    X = np.zeros(n)
+    for i in range(n - 1, -1, -1):
+        X[i] = (Y[i] - sum(U[i][j] * X[j] for j in range(i + 1, n))) / U[i][i]
+    return L, U, X
+
+L, U, X = lu_decomposition(A, B)
+
+print(L, U, sep='\n')
+
+print(X)
+
+def jacobi(A: np.ndarray, B: np.ndarray, TOL: float) -> np.ndarray:
+    n = len(A)
+    X = np.zeros(n)
+    cnt = 0
+    while True:
+        cnt += 1
+        X_new = np.zeros(n)
+        for i in range(n):
+            X_new[i] = (B[i] - sum(A[i][j] * X[j] for j in range(n) if j != i)) / A[i][i]
+        if max(abs(X_new - X)) < TOL:
+            break
+        X = X_new
+    return X, cnt
+
+X, cnt = jacobi(A, B, 1e-6)
+print(X, "with", cnt, "iterations")
+
+def gauss_seidel(A: np.ndarray, B: np.ndarray, TOL: float) -> np.ndarray:
+    n = len(A)
+    X = np.zeros(n)
+    cnt = 0
+    while True:
+        cnt += 1
+        X_new = np.zeros(n)
+        for i in range(n):
+            X_new[i] = (B[i] - sum(A[i][j] * X_new[j] for j in range(i)) - sum(A[i][j] * X[j] for j in range(i + 1, n))) / A[i][i]
+        if max(abs(X_new - X)) < TOL:
+            break
+        X = X_new
+    return X, cnt
+
+X, cnt = gauss_seidel(A, B, 1e-6)
+print(X, "with", cnt, "iterations")
+```
+
 ## 第八章作业上机实验
 
 ### 已知观测数据，求一个二次多项式拟合这组数据，试写出其最小二乘拟合模型，并给出其正则方程组及其解。
@@ -587,12 +853,56 @@ $$
 | :-: | :-: | :-: | :-: | :-: | :-: |
 | $f(x)$ | $0$ | $1$ | $2$ | $1$ | $0$ |
 
+设二次多项式为 $P(x) = a_0 + a_1 x + a_2 x^2$，使用最小二乘拟合求解，$n = 2$ 时可得到以下误差方程 $$\begin{aligned} 
+E &= \sum \limits_{i = 1}^{m} [y_i - P(x_i)]^2 \\
+  &= \sum \limits_{i = 1}^{m} y_i^2 - 2 \sum \limits_{j = 0}^{2} a_j \left( \sum \limits_{i = 1}^{m} y_i x_i^j \right) + \sum \limits_{j = 0}^{2} \sum \limits_{k = 0}^{2} a_j a_k \left( \sum \limits_{i = 1}^{m} x_i^{j + k} \right)
+\end{aligned}$$
+
+求偏导数得 $$\cfrac{\partial E}{\partial a_j} = -2 \sum \limits_{i = 1}^{m} y_i x_i^j + 2 \sum \limits_{k = 0}^{2} a_k \sum \limits_{i = 1}^{m} x_i^{j + k}, \quad j = 0, 1, 2$$
+
+若使误差最小，则应有偏导数为 $0$，得到下面的正则方程组：
+
+$$
+\begin{cases}
+a_0 \sum x_i^0 + a_1 \sum x_i^1 + a_2 \sum x_i^2 = \sum y_i x_i^0 \\
+a_0 \sum x_i^1 + a_1 \sum x_i^2 + a_2 \sum x_i^3 = \sum y_i x_i^1 \\
+a_0 \sum x_i^2 + a_1 \sum x_i^3 + a_2 \sum x_i^4 = \sum y_i x_i^2 
+\end{cases}
+$$
+
+于是解线性方程组即可。解得 $a_0 = 1.65714286, a_1 = 0, a_2 = -0.42857143$，故 $$P(x) = -0.4286 x^2 + 1.6571$$
+
+Python 求解代码如下：
+
+```python
+X = np.array([-2, -1, 0, 1, 2])
+Y = np.array([0, 1, 2, 1, 0])
+
+def least_squares(X: np.ndarray, Y: np.ndarray, n: int) -> np.ndarray:
+    A = np.zeros((n + 1, n + 1))
+    B = np.zeros(n + 1)
+    for i in range(n + 1):
+        for j in range(n + 1):
+            A[i][j] = sum(x ** (i + j) for x in X)
+        B[i] = sum(Y[j] * X[j] ** i for j in range(len(X)))
+    return np.linalg.solve(A, B)
+
+n = 2
+a = least_squares(X, Y, n)
+print(a)
+```
+
 ### 研究发现单原子波函数的基本形式为 $y = ae^{-bx}$，试根据实验室测试数据确定参数 $a, b$。
 
 | $x$ | $0$ | $1$ | $2$ | $4$ |
 | :-: | :-: | :-: | :-: | :-: |
 | $f(x)$ | $2.010$ | $1.210$ | $0.740$ | $0.450$ |
 
+由于按照最小二乘法求偏导对题设背景很困难，因此考虑求对数，有 $$\ln y = \ln a - bx$$
+
+整理上式，可变为求以下多项式的最小二乘拟合：$$t = a^* + b^* x, \quad \text{where } t = \ln y, a^* = \ln a, b^* = -b$$
+
+按照和上一个任务相同的求解方法，求得 $a = 1.81232309, b = 0.36989939$。因此有 $$y = 1.8123e^{-0.3699 x}$$
 
 ## 第九章作业上机实验
 
@@ -606,13 +916,151 @@ A = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-### 分别利用 Householder 变换和 Givens 旋转变化方法求 $\mathbf{A}$ 的 QR 分解。
+#### 幂法
+
+其基于 $$\lim \limits_{k \to \infty} \mathbf{A}^k \mathbf{x} = \lim \limits_{k \to \infty} \lambda_1^k \beta_1 \mathbf{v}^{(1)}$$ 其中 $\lambda_1$ 是主特征值，$\mathbf{x} = \sum \beta_j \mathbf{v}^j$。
+
+注意到当 $\vert \lambda_1 \vert > 1$ 时， $||\mathbf{x}^{(k)}|| \to \infty$，故需将迭代向量规范化。
+
+取 $\mathbf{x}^{(0)} = \mathbf{y}^{(0)} = \begin{bmatrix} 1 & 1 & 1 \end{bmatrix}$，$\mathbf{x}^{(k)} = \mathbf{A} \mathbf{y}^{(k - 1)}$，$\mathbf{y}^{(k)} = \cfrac{\mathbf{x}^{(k)}}{||\mathbf{x}^{(k)}||_\infty}$，最终求解的 $\mathbf{x}$ 即为特征向量。
+
+#### 对称幂法
+
+注意到对称矩阵性质，有 $$\mathbf{x}_k^T \mathbf{x}_k = \sum \limits_{j = 1}^{n} \beta_j^2 \lambda_j^{2k} = \beta_1^2 \lambda_1^{2k} \left[ 1 + \sum \limits_{j = 2}^{n} \left( \cfrac{\beta_j}{\beta_1} \right)^2 \left( \cfrac{\lambda_j}{\lambda_n} \right)^{2k} \right]$$ 且 $$\mathbf{x}_k^T \mathbf{A} \mathbf{x}_k = \sum \limits_{j = 1}^{n} \beta_j^2 \lambda_j^{2k + 1} = \beta_1^2 \lambda_1^{2k} \left[ 1 + \sum \limits_{j = 2}^{n} \left( \cfrac{\beta_j}{\beta_1} \right)^2 \left( \cfrac{\lambda_j}{\lambda_n} \right)^{2k + 1} \right]$$ 故有 $$\lim \limits_{k \to \infty} \cfrac{\mathbf{x}_k^T \mathbf{A} \mathbf{x}_k}{\mathbf{x}_k^T \mathbf{x}_k} = \lambda_1$$
+
+可在迭代向量规范化时使用 2 范数，加快收敛。
+
+### 反幂法
+
+对矩阵 $\mathbf{A}^{-1}$ 用幂法，即可计算最大特征值 $1 / \lambda_n$，即可计算 $\mathbf{A}$ 的最小特征值 $\lambda_n$。
+
+在实际计算中，将矩阵求逆转换为求解线性方程组 $\mathbf{A} \mathbf{x}^{(k + 1)} = \mathbf{x}^{(k)}$ 替代。
+
+若求解最大特征值，则取适当的 $\alpha$，求解 $(\mathbf{A} - \alpha \mathbf{I})^{-1}$ 的最小特征值 $\lambda'$，则 $\mathbf{A}$ 的最大特征值为 $\alpha + 1 / \lambda'$。
+
+在 tolerance 为 $10^{-7}$ 的情况下，求解结果如下：
+
+```plain
+power_method: got lambda = 5.999999821186076, X = [ 5.99999982 -5.99999955  5.99999955], with 26 iterations
+symmetric_power_method: got lambda = 5.9999999999999165, X = [ 0.57735041 -0.5773502   0.5773502 ], with 24 iterations
+inverse_power_method: got lambda = 6.000000006191799, X = [ 1.99999998 -1.99999995  1.99999995], with 13 iterations
+```
+
+注意到反幂法在 $\alpha$ 取值适当的情况下收敛速度显著更快。
+
+### 分别利用 Householder 变换和 Givens 旋转变换方法求 $\mathbf{A}$ 的 QR 分解。
 
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 1 & 0 & 0 \\
 1 & 1 & 0 \\
 1 & 1 & 1 \\
 1 & 1 & 1
 \end{bmatrix}
+$$
+
+#### Householder 变换
+
+Householder 目标为使得一个矩阵 $\mathbf{H}$ 将一个向量的，除了一个维度以外的其他所有分量，全部转化为 $0$。
+
+对本题有以下求解步骤：
+
+1. 使 $\mathbf{A}$ 的第一列下三行全部归零。
+
+    设 $\mathbf{x} = \begin{bmatrix} 1 & 1 & 1 & 1 \end{bmatrix}^T$，选择 $\mathbf{e_1} = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}^T$，构造 $\mathbf{u} = \mathbf{x} - ||\mathbf{x}|| \mathbf{e_1}$。
+
+    解得 $||x|| = 2$，故有 $$ \mathbf{u} = \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} - 2 \begin{bmatrix} 1 \\ 0 \\ 0 \\ 0 \end{bmatrix} = \begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} $$ 归一化 $ \mathbf{u} $ 得到 $ \mathbf{v} = \frac{\mathbf{u}}{\|\mathbf{u}\|} $。注意到 $ \mathbf{u} $ 的二范数 $ \|\mathbf{u}\| = 2 $，所以 $$ \mathbf{v} = \cfrac{1}{2}\begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} $$
+
+    Householder 矩阵 $ \mathbf{H_1} = I - 2 \mathbf{v} \mathbf{v}^T $:
+
+    $$
+    \mathbf{v} \mathbf{v}^T = \frac{1}{4} \begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} \begin{bmatrix} -1 & 1 & 1 & 1 \end{bmatrix} = \frac{1}{4} \begin{bmatrix} 1 & -1 & -1 & -1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \end{bmatrix}
+    $$
+
+    $$
+    \mathbf{H_1} = I - 2 \mathbf{v} \mathbf{v}^T = I - \frac{1}{2} \begin{bmatrix} 1 & -1 & -1 & -1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} \frac{1}{2} & \frac{1}{2} & \frac{1}{2} & \frac{1}{2} \\ \frac{1}{2} & \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & \frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} & \frac{1}{2} \end{bmatrix}
+    $$
+
+    计算 $ \mathbf{H_1} \mathbf{A} $:
+
+    $$
+    \mathbf{H_1} \mathbf{A} = \begin{bmatrix} \frac{1}{2} & \frac{1}{2} & \frac{1}{2} & \frac{1}{2} \\ \frac{1}{2} & \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & \frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} & \frac{1}{2} \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 0 & -1 \end{bmatrix}
+    $$
+
+2. 使矩阵 $ \mathbf{H_1} \mathbf{A} $ 的第二列的最后两行元素归零。
+
+    设 $ \mathbf{y} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} $，选择单位向量 $ \mathbf{e}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix} $，构造向量 $ \mathbf{w} = \mathbf{y} - \|\mathbf{y}\|\mathbf{e}_1 $。
+
+    计算 $ \|\mathbf{y}\| = \sqrt{2} $，故 $ \mathbf{w} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} - \sqrt{2} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 1 - \sqrt{2} \\ 1 \end{bmatrix} $。
+    
+    归一化 $ \mathbf{w} $ 得到 $ \mathbf{u} = \frac{\mathbf{w}}{\|\mathbf{w}\|} $。注意到 $ \mathbf{w} $ 的二范数 $ \|\mathbf{w}\| = \sqrt{3 - 2\sqrt{2}} $。
+
+    构造第二个 Householder 矩阵 $ \mathbf{H_2} = I - 2 \mathbf{u} \mathbf{u}^T $，$ \mathbf{u} = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ -1 \end{bmatrix} $。
+
+    $$
+    \mathbf{H_2} = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & \frac{1}{2} & \frac{1}{2} \\ 0 & 0 & \frac{1}{2} & -\frac{1}{2} \end{bmatrix}
+    $$
+
+    计算 $ \mathbf{H_2} \mathbf{H_1} \mathbf{A} $:
+
+    $$
+    \mathbf{H_2} \mathbf{H_1} \mathbf{A} = \mathbf{H_2} \begin{bmatrix} 2 & 1 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 0 & -1 \end{bmatrix} = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & -\sqrt{2} \\ 0 & 0 & 0 \end{bmatrix}
+    $$
+
+此时矩阵已上三角，QR 分解为：
+
+$$
+\mathbf{Q} = \mathbf{H_2} \mathbf{H_1}, \quad \mathbf{R} = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & -\sqrt{2} \\ 0 & 0 & 0 \end{bmatrix}
+$$
+
+#### Givens 旋转变换方法
+
+对于每对 $ a_{ij} $ 和 $ a_{ik} $，引入 Givens 旋转 $ \mathbf{G} $，将 $ a_{ij} $ 变为零。
+
+1. 旋转第一列第 2 和第 1 行，使 $ a_{21} $ 归零
+
+    设 $ c = \cfrac{1}{\sqrt{2}} $，$ s = \cfrac{1}{\sqrt{2}} $，构造 Givens 矩阵：
+
+    $$
+    \mathbf{G}_{12} = \begin{bmatrix} \frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 & 0 \\ -\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+    $$
+
+    应用 $ \mathbf{G}_{12} $ 到 $ \mathbf{A} $：
+
+    $$
+    \mathbf{G}_{12} \mathbf{A} = \begin{bmatrix} \sqrt{2} & \frac{1}{\sqrt{2}} & 0 \\ 0 & \frac{1}{\sqrt{2}} & 0 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}
+    $$
+
+2. 旋转第一列第 3 和第 1 行，使 $ A_{31} $ 归零
+
+    设 $ c = \cfrac{\sqrt{2}}{\sqrt{3}} $，$ s = \cfrac{1}{\sqrt{3}} $，构造 Givens 矩阵：
+
+    $$
+    \mathbf{G}_{13} = \begin{bmatrix} \frac{\sqrt{2}}{\sqrt{3}} & 0 & \frac{1}{\sqrt{3}} & 0 \\ 0 & 1 & 0 & 0 \\ -\frac{1}{\sqrt{3}} & 0 & \frac{\sqrt{2}}{\sqrt{3}} & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+    $$
+
+    应用 $ \mathbf{G}_{13} $ 到 $ \mathbf{G}_{12} \mathbf{A} $：
+
+    $$
+    \mathbf{G}_{13} \mathbf{G}_{12} \mathbf{A} = \begin{bmatrix} \sqrt{3} & \frac{\sqrt{2}}{\sqrt{3}} & \frac{1}{\sqrt{3}} \\ 0 & \frac{1}{\sqrt{2}} & 0 \\ 0 & \frac{\sqrt{2}}{\sqrt{3}} & -\frac{1}{\sqrt{3}} \\ 1 & 1 & 1 \end{bmatrix}
+    $$
+
+3. 旋转第二列第 4 和第 1 行，使 $ \mathbf{A}_{41} $ 归零
+
+    设 $ c = \cfrac{\sqrt{2}}{\sqrt{3}} $，$ s = \cfrac{1}{\sqrt{3}} $，构造 Givens 矩阵：
+
+    $$
+    \mathbf{G}_{14} = \begin{bmatrix} \frac{\sqrt{2}}{\sqrt{3}} & 0 & 0 & \frac{1}{\sqrt{3}} \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ -\frac{1}{\sqrt{3}} & 0 & 0 & \frac{\sqrt{2}}{\sqrt{3}} \end{bmatrix}
+    $$
+
+    应用 $ \mathbf{G}_{14} $ 到 $ \mathbf{G}_{13} \mathbf{G}_{12} \mathbf{A} $：
+
+    $$
+    \mathbf{G}_{14} \mathbf{G}_{13} \mathbf{G}_{12} \mathbf{A} = \begin{bmatrix} 2 & \frac{\sqrt{2}}{\sqrt{3}} & \frac{1}{\sqrt{3}} \\ 0 & \frac{1}{\sqrt{2}} & 0 \\ 0 & \frac{\sqrt{2}}{\sqrt{3}} & -\frac{1}{\sqrt{3}} \\ 0 & \frac{1}{\sqrt{2}} & \frac{\sqrt{2}}{\sqrt{3}} \end{bmatrix}
+    $$
+
+此时矩阵已上三角，QR 分解为：
+
+$$
+\mathbf{Q} = \mathbf{G}_{14} \mathbf{G}_{13} \mathbf{G}_{12}, \quad \mathbf{R} = \begin{bmatrix} 2 & \frac{\sqrt{2}}{\sqrt{3}} & \frac{1}{\sqrt{3}} \\ 0 & \frac{1}{\sqrt{2}} & 0 \\ 0 & \frac{\sqrt{2}}{\sqrt{3}} & -\frac{1}{\sqrt{3}} \\ 0 & \frac{1}{\sqrt{2}} & \frac{\sqrt{2}}{\sqrt{3}} \end{bmatrix}
 $$
