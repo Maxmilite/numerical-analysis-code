@@ -51,13 +51,15 @@ print(fpow(x, y))
 
 ## 第二章作业上机实验
 
-### 求方程 $2x^2 + x - 15 = 0$ 的正根（$x* = 2.5$）近似值。
+### 求方程 $2x^2 + x - 15 = 0$ 的正根（$x^* = 2.5$）近似值。
 
 提供的三种方法分别是两种不动点迭代方法和牛顿法。
 
-$x_{k+1} = 15 - x_k^2$ 不收敛，因数值过大无法计算。
+$x_{k+1} = 15 - x_k^2$ 不收敛，因数值过大无法计算。后发现是 typo，修正为 $x_{k + 1} = g(x_{k}) = x_k - f(x_k) = 15 - 2x_k^2$，但仍然数值过大无法计算。
 
-$x_{k + 1} = \cfrac{15}{2x_k + 1}$ 结果如图：
+注意到 $|g'(2)| = |-8| = 8 > 1$（即便在错误情况 $x_{k + 1} = 15 - x_k^2$ 下也有 $|g'(2)| = 4 > 1$），不满足不动点法的收敛条件。序列发散。
+
+设 $f(x) = 2x^2 + x - 15$，结果如图：
 
 ![](image/experiment/fig1.png)
 
@@ -68,61 +70,62 @@ $x_{k + 1} = x_k - \cfrac{2x_k^2 + x_k - 15}{4x_k + 1}$ 结果如图：
 **收敛性分析**
 
 
-#### 1. $x_{k+1} = 15 - x_k^2$
+#### $x_{k+1} = 15 - 2x_k^2$
 这个公式基于将方程变形为：
 $ 2x^2 + x - 15 = 0 \implies x = 15 - x^2 $
 
 **稳定性和收敛性分析：**
-- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \epsilon_k$，其中 $\epsilon_k$ 是小的偏差。
+
+同上，令 $g(x) = 15 - 2x_k^2$。注意到 $$|g'(2)| = |-8| = 8 > 1$$ 不满足不动点法的收敛条件，不收敛。
+
+同时：
+
+- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \varepsilon_k$，其中 $\varepsilon_k$ 是小的偏差。
 - 代入迭代公式：
-  $ x_{k+1} = 15 - (x^* + \epsilon_k)^2 $
-  $ x_{k+1} = 15 - (2.5 + \epsilon_k)^2 $
-  $ x_{k+1} = 15 - (6.25 + 5\epsilon_k + \epsilon_k^2) $
-  $ x_{k+1} = 8.75 - 5\epsilon_k - \epsilon_k^2 $
+  $$ x_{k+1} = 15 - (x^* + \varepsilon_k)^2 $$
+  $$ x_{k+1} = 15 - (2.5 + \varepsilon_k)^2 $$
+  $$ x_{k+1} = 15 - (6.25 + 5\varepsilon_k + \varepsilon_k^2) $$
+  $$ x_{k+1} = 8.75 - 5\varepsilon_k - \varepsilon_k^2 $$
+- 对于小的 $\varepsilon_k$，忽略 $\varepsilon_k^2$ 项：
+  $$ x_{k+1} \approx 8.75 - 5\varepsilon_k $$
+  误差 $\varepsilon_k$ 被放大了 5 倍，这个迭代公式是不稳定的并且是发散的。
 
-- 对于小的$\epsilon_k$，忽略$\epsilon_k^2$项：
-  $ x_{k+1} \approx 8.75 - 5\epsilon_k $
-  这里我们看到，误差$\epsilon_k$被放大了5倍，所以这个迭代公式是不稳定的并且是发散的。
-
-#### 2. $x_{k+1} = \frac{15}{2x_k + 1}$
+#### $x_{k+1} = \cfrac{15}{2x_k + 1}$
 这个公式基于将方程变形为：
-$ 2x^2 + x - 15 = 0 \implies x = \frac{15}{2x + 1} $
+$ 2x^2 + x - 15 = 0 \implies x = \cfrac{15}{2x + 1} $
 
 **稳定性和收敛性分析：**
-- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \epsilon_k$，其中 $\epsilon_k$ 是小的偏差。
+- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \varepsilon_k$，其中 $\varepsilon_k$ 是小的偏差。
 - 代入迭代公式：
-  $ x_{k+1} = \frac{15}{2(x^* + \epsilon_k) + 1} $
-  $ x_{k+1} = \frac{15}{2(2.5 + \epsilon_k) + 1} $
-  $ x_{k+1} = \frac{15}{6 + 2\epsilon_k} $
-  $ x_{k+1} \approx \frac{15}{6(1 + \frac{2\epsilon_k}{6})} $
-  $ x_{k+1} \approx \frac{15}{6} \cdot \left(1 - \frac{2\epsilon_k}{6}\right) $
-  $ x_{k+1} \approx 2.5 \cdot \left(1 - \frac{\epsilon_k}{3}\right) $
-  $ x_{k+1} \approx 2.5 - \frac{2.5\epsilon_k}{3} $
-  $ x_{k+1} \approx 2.5 - 0.833\epsilon_k $
+  $$ x_{k+1} = \frac{15}{2(x^* + \varepsilon_k) + 1} $$
+  $$ x_{k+1} = \frac{15}{2(2.5 + \varepsilon_k) + 1} $$
+  $$ x_{k+1} = \frac{15}{6 + 2\varepsilon_k} $$
+  $$ x_{k+1} \approx \frac{15}{6(1 + \frac{2\varepsilon_k}{6})} $$
+  $$ x_{k+1} \approx \frac{15}{6} \cdot \left(1 - \frac{2\varepsilon_k}{6}\right) $$
+  $$ x_{k+1} \approx 2.5 \cdot \left(1 - \frac{\varepsilon_k}{3}\right) $$
+  $$ x_{k+1} \approx 2.5 - \frac{2.5\varepsilon_k}{3} $$
+  $$ x_{k+1} \approx 2.5 - 0.833\varepsilon_k $$
+- 这里误差 $\varepsilon_k$ 被缩小了约 0.833 倍，这个迭代公式是收敛的，但是线性收敛。
 
-- 这里误差$\epsilon_k$被缩小了约0.833倍，所以这个迭代公式是收敛的，但收敛速度较慢。
-
-#### 3. $x_{k+1} = x_k - \frac{2x_k^2 + x_k - 15}{4x_k + 1}$
+#### $x_{k+1} = x_k - \cfrac{2x_k^2 + x_k - 15}{4x_k + 1}$
 这个公式基于牛顿法：
-$ f(x) = 2x^2 + x - 15 $
-$ f'(x) = 4x + 1 $
-$ x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)} = x_k - \frac{2x_k^2 + x_k - 15}{4x_k + 1} $
+$$ f(x) = 2x^2 + x - 15 $$
+$$ f'(x) = 4x + 1 $$
+$$ x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)} = x_k - \frac{2x_k^2 + x_k - 15}{4x_k + 1} $$
 
 **稳定性和收敛性分析：**
-- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \epsilon_k$，其中 $\epsilon_k$ 是小的偏差。
+- 在根 $x^* = 2.5$ 附近，设 $x_k = x^* + \varepsilon_k$，其中 $\varepsilon_k$ 是小的偏差。
 - 牛顿法通常具有二阶收敛速度：
-  $ x_{k+1} = x_k - \frac{f(x^* + \epsilon_k)}{f'(x^* + \epsilon_k)} $
+  $$ x_{k+1} = x_k - \frac{f(x^* + \varepsilon_k)}{f'(x^* + \varepsilon_k)} $$
 
-  由于牛顿法的二阶收敛性质：
-  $ \epsilon_{k+1} \approx C\epsilon_k^2 $
-  其中C是一个常数。
-
-- 因此，误差的平方使得收敛速度非常快。这表明这个迭代公式在根附近收敛速度非常快，通常是最有效的方法。
+- 由于牛顿法的二阶收敛性质：
+  $$ \varepsilon_{k+1} \approx C\varepsilon_k^2 $$
+  其中 $C$ 是一个常数，该方法是二阶收敛且稳定。
 
 #### 总结
 - $x_{k+1} = 15 - x_k^2$：不稳定，发散。
-- $x_{k+1} = \frac{15}{2x_k + 1}$：稳定，收敛速度较慢。
-- $x_{k+1} = x_k - \frac{2x_k^2 + x_k - 15}{4x_k + 1}$：稳定，收敛速度快（二阶收敛）。
+- $x_{k+1} = \cfrac{15}{2x_k + 1}$：稳定，线性收敛。
+- $x_{k+1} = x_k - \cfrac{2x_k^2 + x_k - 15}{4x_k + 1}$：稳定，二阶收敛。
 
 ### 证明方程 $2 - 3x - \sin x = 0$ 在 $(0, 1)$ 内有且仅有一个实根。使用二分法求误差不大于 $0.0005$ 的根，及需要的迭代次数。
 
@@ -168,7 +171,7 @@ x0 = 31.41592653589793, 不收敛
 在二分法中，取二分点为 $x = \frac{l + r}{2}$，在牛顿法中，取初始点为 $x_0 = 0.5$，在割线法中，取初始点为 $x_0 = 0, x_1 = 1$，在错位法中，取初始点为 $x_0 = 0, x_1 = 1$，结果如下：
 
 ```plain
-bisection: res = 0.99993896484375, cnt = 14
+bisection: res = 0.25921630859375, cnt = 14
 newton: res = 0.25917110166149104, cnt = 3
 secant: res = 0.2591712288816814, cnt = 4
 regula_falsi: res = 0.25917408510579704, cnt = 4
@@ -189,7 +192,7 @@ def bisection(l: float, r: float) -> float:
     while (r - l) > TOL:
         cnt += 1
         x = (l + r) / 2
-        if f(x) > 0:
+        if f(x) * f(r) < 0:
             l = x
         else:
             r = x
@@ -252,19 +255,15 @@ print(f'regula_falsi: res = {res}, cnt = {cnt}')
 
 ### 基于不同边界条件的样条函数计算公式推导：自然边界、固定边界、周期边界、强制第一个子区间和第二个子区间样条多项式的三阶导数相同，倒数第二个子区间和最后一个子区间的三次样条函数的三阶导数相等。
 
+对于一个在节点 $(x_0, y_0), (x_1, y_1), \cdots, (x_n, y_n)$ 上的三次样条函数 $S(x) $，可以表示为：
+
+$ S_i(x) = a_i + b_i(x - x_i) + c_i(x - x_i)^2 + d_i(x - x_i)^3 \quad \text{for} \; x \in [x_i, x_{i+1}] $
+
 #### 自然边界
 
 在自然边界条件下，要求在端点处的二阶导数为零。这意味着样条函数的曲率在边界上为零，常用于边界不受约束的情况。
 
-对于一个在节点 $(x_0, y_0), (x_1, y_1), \cdots, (x_n, y_n)$ 上的三次样条函数 $S(x) $，可以表示为：
-
-$ S_i(x) = a_i + b_i(x - x_i) + c_i(x - x_i)^2 + d_i(x - x_i)^3 ~ \text{for} \; x \in [x_i, x_{i+1}] $
-
 自然边界条件：$ S''(x_0) = 0, S''(x_n) = 0 $
-
-##### 推导
-
-对于自然边界条件，需要解以下线性方程组：
 
 $ h_i = x_{i+1} - x_i$，$\Delta y_i = y_{i+1} - y_i $
 
@@ -280,8 +279,6 @@ $ S_i''(x_{i+1}) = S_{i+1}''(x_{i+1})$，$\int_{x_i}^{x_{i+1}} S_i''(x) \, \text
 
 固定边界条件：$ S'(x_0) = f'(x_0), S'(x_n) = f'(x_n) $
 
-##### 推导
-
 对于固定边界条件，构建样条函数 $ S_i(x) $ 的系统：
 
 $ S_i(x_i) = y_i$，$S_i(x_{i+1}) = y_{i+1}$，$S_i'(x_i) = f'(x_i)$，$S_i'(x_{i+1}) = f'(x_{i+1}) $
@@ -292,8 +289,6 @@ $ S_i(x_i) = y_i$，$S_i(x_{i+1}) = y_{i+1}$，$S_i'(x_i) = f'(x_i)$，$S_i'(x_{
 
 周期边界条件：$ S(x_0) = S(x_n)$，$S'(x_0) = S'(x_n)$，$S''(x_0) = S''(x_n) $
 
-##### 推导
-
 对于周期边界条件，需要解以下线性方程组：
 
 $ S_0(x_0) = S_{n-1}(x_n)$，$S_0'(x_0) = S_{n-1}'(x_n)$，$S_0''(x_0) = S_{n-1}''(x_n) $
@@ -302,7 +297,7 @@ $ S_0(x_0) = S_{n-1}(x_n)$，$S_0'(x_0) = S_{n-1}'(x_n)$，$S_0''(x_0) = S_{n-1}
 
 #### 第一个子区间和第二个子区间样条多项式的三阶导数相等，倒数第二个子区间和最后一个子区间的三次样条函数的三阶导数相等
 
-$ S'''_0(x) = S'''_1(x) ~ \text{for} \; x \in [x_0, x_1]$，$S'''_{n-1}(x) = S'''_n(x) ~ \text{for} \; x \in [x_{n-1}, x_n] $
+$ S'''_0(x) = S'''_1(x) \quad \text{for} \; x \in [x_0, x_1]$，$S'''_{n-1}(x) = S'''_n(x) \quad \text{for} \; x \in [x_{n-1}, x_n] $
 
 ### 以 $y = \sin(x)$ 为例，在 $[0,π]$ 区间内生成 $11$ 个、$21$ 个数据点，设计算法或程序，用上述 $4$ 个边界条件，分别计算其样条插值，并作图比较，分析其差异性。
 
@@ -316,7 +311,7 @@ $ S'''_0(x) = S'''_1(x) ~ \text{for} \; x \in [x_0, x_1]$，$S'''_{n-1}(x) = S''
 
 ### 求一个次数不高于 $4$ 次的多项式，满足某个条件。
 
-#### 1. $f(1) = f'(1) = 0$，$f(2) = f'(2) = 0$，$f(3) = 1$
+#### $f(1) = f'(1) = 0$，$f(2) = f'(2) = 0$，$f(3) = 1$
 
 构造多项式 $$f(x) = a(x - 1)^2 (x - 2)^2.$$
 
@@ -338,7 +333,7 @@ print(f'f(1) = {f(1)}, f\'(1) = {df(1)}, f(2) = {f(2)}, f\'(2) = {df(2)}, f(3) =
 
 结果为 `f(1) = 0.0, f'(1) = 0.0, f(2) = 0.0, f'(2) = 0.0, f(3) = 1.0`。
 
-#### 2. $f(0) = f'(0) = 0$，$f(1) = f'(1) = 1$，$f(2) = 1$
+#### $f(0) = f'(0) = 0$，$f(1) = f'(1) = 1$，$f(2) = 1$
 
 令 $f(x) = ax^4 + bx^3 + cx^2 + \text{ d} x + e$。由 $f(0) = f'(0) = 0$，有 $d = e = 0$。故 $f(x) = ax^4 + bx^3 + cx^2$。
 
@@ -448,7 +443,7 @@ print(f's(1) = {s(1)}, s(2) = {s(2)}, s(3) = {s(3)}, s\'(1) = {ds(1)}, s\'(3) = 
 ## 第四章作业上机实验
 ### 推导复合梯形公式及其误差估计；推导基于误差控制的逐次半积分梯形公式及其误差估计。
 
-#### 梯形公式推导
+#### 复合梯形公式推导
 
 假设需要计算 $\int_a^b f(x) \text{ d} x$。
 
@@ -464,7 +459,113 @@ print(f's(1) = {s(1)}, s(2) = {s(2)}, s(3) = {s(3)}, s\'(1) = {ds(1)}, s\'(3) = 
 
 故有 $$ \min \limits_{x \in [a, b]} f''(x) \leq \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) \leq \max \limits_{x \in [a, b]} f''(x)$$
 
-由中值定理，有 $$\exists \mu \in (a, b), f''(\mu) = \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) $$ 故 $E(f) = \cfrac {h^3}{12} n f''(\mu)$。最终有 $$ \int_{a}^{b} f(x) \text{ d} x = \cfrac h2 \left[ f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i) \right] - \cfrac{h^2}{12} (b - a) f''(\mu)$$ 
+由中值定理，有 $$\exists \mu \in (a, b), f''(\mu) = \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) $$ 故 $E(f) = \cfrac {h^3}{12} n f''(\mu)$。最终有 $$ \int_{a}^{b} f(x) \text{ d} x = \cfrac h2 \left[ f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i) \right] - \cfrac{h^2}{12} (b - a) f''(\mu)$$
+
+Let $f \in C^2[a, b], h = (b - a) / n$, and $x_j = a + jh$ for each $j = 0, 1, \cdots, n$.
+
+To prove there exists a $\mu \in (a, b)$ for which the Composite trapezoidal rule for $n$ subintervals can be written with its error term as 
+$$
+\int_a^b f(x) \text{ d} x = \cfrac h2 [f(a) + 2 \sum \limits_{j = 1}^{n - 1} f(x_j) + f(b)] - \cfrac{b - a}{12} h^2 f''(\mu). 
+$$
+
+Let $T(f, h) = \cfrac h2 [f(a) + f(b)] + h \sum \limits_{j = 1}^{n - 1} f(x_j)$, and thus $\int_a^b f(x) \text{ d} x = T(f, h) + E_T(f, h)$.
+
+The key is to prove that there exists $\mu \in (a, b)$, $E_T(f, h)$ can be represented as $\cfrac{- (b - a)}{12} h^2 f''(\mu)$.
+
+First, determine the error term of the formula on $[x_0, x_1]$. Integrate the Lagrange polynomial $P_1(x)$ and its remainder 
+$$
+\int_{x_0}^{x_1} f(x) \text{ d} x = \int_{x_0}^{x_1} P_1(x) \text{ d} x + \int_{x_0}^{x_1} \cfrac{(x - x_0) (x - x_1)}{2!} f''(c(x)) \text{ d} x.
+$$
+
+On $[x_0, x_1]$, $(x - x_0)(x - x_1)$ will always be non-positive, and $f''(c(x))$ is continguous on $[x_0, x_1]$. According to \textit{the second mean value theorem of integrals}, there exists $c_1$, 
+$$
+    \int_{x_0}^{x_1} f(x) \text{ d} x = \cfrac h2 (f_0 + f_1) + f''(c_1) \int_{x_0}^{x_1} \cfrac{(x - x_0)(x - x_1)}{2!} \text{ d} x.
+$$
+
+Let $x = x_0 + ht$: 
+$$
+\begin{aligned}
+    \int_{x_0}^{x_1} f(x) \text{ d} x &= \cfrac h2 (f_0 + f_1) + \cfrac{f''(c_1)}{2} \int_{0}^{1} {h(t - 0)h(t - 1)h} \text{ d} t \\
+    &= \cfrac h2 (f_0 + f_1) + \cfrac{f''(c_1)}{2} h^3 \int_{0}^{1} t(t - 1) \text{ d} t \\
+    &= \cfrac h2 (f_0 + f_1) - \cfrac{f''(c_1)}{12} h^3. \\
+\end{aligned}
+$$
+
+Consider 
+$$
+\int_a^b f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \int_{x_{k - 1}}^{x_k} f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \cfrac h2 (f(x_{k - 1}) + f(x_k)) - \cfrac{h^3}{12} \sum\limits_{k = 1}^{M} f''(c_k), 
+$$
+
+The first $\sum$ is $T(f, h)$. For the second $\sum$, let $h = \cfrac{b - a}{M}$, and 
+$$
+\int_a^b f(x) \text{ d} x = T(f, h) - \cfrac{(b - a)h^2}{12} \left(\cfrac 1M \sum\limits_{k = 1}^{M} f''(c_k) \right) = T(f, h) - \cfrac{(b - a)h^2}{12} f''(c).
+$$
+
+#### 逐次半积分梯形积分
+
+##### Preface
+
+Suppose that we want to approximate $\int_a^b f(x) \text{ d} x$ using \textbf{Composite Trapzoidal Rule} to within a specified tolerance $\varepsilon > 0$.
+
+Let $n = 2$, thus $h_1 = h = (b - a) / 2$. The procedure by \textbf{Composite Trapzoidal Rule} results in the following: 
+$$
+\int_a^b f(x) \text{ d} x = \cfrac h2 (f(a) + f(b)) - \cfrac{h^3}{12} f^{(2)}(\mu), \mu \in (a, b).
+$$
+
+Let $n = 4$ and step size $h_2 = (b - a) / 4 = h / 2$ giving 
+$$
+\begin{aligned}
+\int_a^b f(x) \text{ d} x &= \cfrac {h_2} 2 \left[ f(a) + 2f(a + h) + f(b) \right] - \cfrac{h^3}{12} f^{(2)}(\mu) \\
+&=  \cfrac h 4 \left[ f(a) + 2f(a + h) + f(b) \right] - \left( \cfrac h2 \right)^2 
+ \cfrac{(b - a)}{24} f^{(2)}(\overset{\sim}{\mu}).
+\end{aligned}
+$$
+
+The error estimation is derived by assuming that $\mu = \overset{\sim}{\mu}$.
+
+Let $T(l, r) = \cfrac h4 [f(l) + f(r)]$, and it can be figured out that 
+$$
+T(a, \cfrac{a + b}{2}) + T(\cfrac{a + b}{2}, b) - \cfrac{h^3}{12 \times 4} f^{(2)}(\mu) \approx T(a, b) - \cfrac{h^3}{12} f^{(2)}(\mu).
+$$
+
+So 
+$$
+\cfrac{h^3}{12} f^{(2)}(\mu) \approx \cfrac 43 \left[T(a, b) - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right],
+$$ and 
+$$
+\left | \int_a^b f(x) \text{ d} x - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right | \approx \cfrac 13 \left[T(a, b) - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right].
+$$
+
+This result means that $T(a, \cfrac{a + b} 2) + T(\cfrac{a + b} 2, b)$ approximates $\int_a^b f(x)$ about 3 times better than it agrees with the known value $T(a, b)$.
+
+##### General Case
+
+Let $n$ be even, thus $h_n = (b - a) / n$.
+
+By the \textit{Composite Trapzoidal Rule}, we have 
+$$
+\int_a^b f(x) \text{ d} x = T(f, h_n) - \cfrac{b - a}{12} h_n^2 f^{(2)}(\mu).
+$$
+
+Next let $h_{2n} = (b - a) / 2n = h_n / 2$, 
+$$
+\int_a^b f(x) \text{ d} x = T(f, h_{2n}) - \cfrac{b - a}{12} \cfrac{h_n^2}{4} f^{(2)}(\mu).
+$$
+
+Thus, 
+$$
+\cfrac{b - a}{12} h_n^2 f^{(2)}(\mu) \approx \cfrac 43 \left[ T(f, h_{n}) - T(f, h_{2n}) \right],
+$$ and 
+$$
+\int_a^b f(x) \text{ d} x - S_{2n} \approx \cfrac 13 \left[ T(f, h_{n}) - T(f, h_{2n}) \right].
+$$
+
+Thus, for the given required tolerance $\varepsilon$, if $\left| T(f, h_{n}) - T(f, h_{2n}) \right| < 3 \varepsilon$, then we have 
+$$
+\int_a^b f(x) \text{ d} x - S_{2n} < \varepsilon.
+$$
+
+That is $S_{2n}$ be the required accurate numerical approximation to $\int_a^b f(x) \text{ d} x$.
 
 ### Let $h = (b - a) / 3, x_0 = a, x_1 = a + h, x_2 = b$. Find the degree of precision of the quadrature formula $\int_a^b f(x) \text{ d} x = \cfrac 94 hf(x_1) + \cfrac 34 hf(x_2)$.
 
