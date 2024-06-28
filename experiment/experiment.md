@@ -162,8 +162,11 @@ print(x, cnt, f(x))
 ```plain
 x0 = 1.5707963267948966, res = 1.8954884189769137, cnt = 15
 x0 = 15.707963267948966, res = 1.8954890013731998, cnt = 19
-x0 = 31.41592653589793, 不收敛
+x0 = 31.41592653589793, res = 1.8955029706849522, cnt = 428
 ```
+
+其中对于 $x_0 = 10 \pi$，其迭代次数达到了 $428$ 次，且结果不符合精度要求（标准值 $1.89549426$）。
+
 初值对结果的影响是，虽然最终结果是相同的，但是迭代次数可能会有所不同。如果初值过大，可能会导致迭代次数过多，甚至不收敛。
 
 ### 已知 $f(x) = 5x - e^x$ 在 $(0, 1)$ 之间有一个实根，试分别利用二分法、牛顿法、割线法、错位法设计相关的计算格式，并编程求解。精确到四位小数。
@@ -535,7 +538,6 @@ $$ and
 $$
 \left | \int_a^b f(x) \text{ d} x - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right | \approx \cfrac 13 \left[T(a, b) - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right].
 $$
-
 This result means that $T(a, \cfrac{a + b} 2) + T(\cfrac{a + b} 2, b)$ approximates $\int_a^b f(x)$ about 3 times better than it agrees with the known value $T(a, b)$.
 
 ##### General Case
@@ -546,12 +548,10 @@ By the \textit{Composite Trapzoidal Rule}, we have
 $$
 \int_a^b f(x) \text{ d} x = T(f, h_n) - \cfrac{b - a}{12} h_n^2 f^{(2)}(\mu).
 $$
-
 Next let $h_{2n} = (b - a) / 2n = h_n / 2$, 
 $$
 \int_a^b f(x) \text{ d} x = T(f, h_{2n}) - \cfrac{b - a}{12} \cfrac{h_n^2}{4} f^{(2)}(\mu).
 $$
-
 Thus, 
 $$
 \cfrac{b - a}{12} h_n^2 f^{(2)}(\mu) \approx \cfrac 43 \left[ T(f, h_{n}) - T(f, h_{2n}) \right],
