@@ -452,21 +452,45 @@ print(f's(1) = {s(1)}, s(2) = {s(2)}, s(3) = {s(3)}, s\'(1) = {ds(1)}, s\'(3) = 
 
 将 $[a, b]$ 分为 $n$ 个小区间，每个小区间宽度 $h = \cfrac{b - a}{n}$。对每个小区间使用梯形法则。设 $x_j = a + j \cdot h$。
 
-梯形法则：$$ \int _a^b f(x) \text{ d} x = \cfrac h2 [f(x_0) + f(x_1)] - \cfrac{h^3}{12} f''(\xi) $$
+梯形法则：
+$$
+\int _a^b f(x) \text{ d} x = \cfrac h2 [f(x_0) + f(x_1)] - \cfrac{h^3}{12} f''(\xi) 
+$$
 
-在所有子区间上应用梯形法则，有 $$ \int _a^b f(x) \text{ d} x = \cfrac h2 \sum \limits_{i = 0}^{n - 1} (f(x_i) + f(x_{i + 1})) - \sum \limits_{i = 0}^{n - 1} \cfrac{h^3}{12} f''(\xi_i) $$ 其中 $\xi_i \in (x_i, x_{i + 1})$。
+在所有子区间上应用梯形法则，有 
+$$
+\int _a^b f(x) \text{ d} x = \cfrac h2 \sum \limits_{i = 0}^{n - 1} (f(x_i) + f(x_{i + 1})) - \sum \limits_{i = 0}^{n - 1} \cfrac{h^3}{12} f''(\xi_i) 
+$$
+其中 $\xi_i \in (x_i, x_{i + 1})$。
 
-将上式拆为估计值和误差部分。对估计值部分，有 $$\cfrac h2 \sum \limits_{i = 0}^{n - 1} (f(x_i) + f(x_{i + 1})) = \cfrac h2 \left( f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i)  \right)$$
+将上式拆为估计值和误差部分。对估计值部分，有 
+$$
+\cfrac h2 \sum \limits_{i = 0}^{n - 1} (f(x_i) + f(x_{i + 1})) = \cfrac h2 \left( f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i)  \right)
+$$
 
-对误差部分，不妨设 $E(f) = - \sum \limits_{i = 0}^{n - 1} \cfrac{h^3}{12} f''(\xi_i)$。因为 $f \in C^2[a, b]$，故 $f''$ 在 $[a, b]$ 上连续，有最大最小值，即 $$ \min \limits_{x \in [a, b]} f''(x) \leq f''(\xi_i) \leq \max \limits_{x \in [a, b]} f''(x)$$
+对误差部分，不妨设 $E(f) = - \sum \limits_{i = 0}^{n - 1} \cfrac{h^3}{12} f''(\xi_i)$。因为 $f \in C^2[a, b]$，故 $f''$ 在 $[a, b]$ 上连续，有最大最小值，即 
+$$
+\min \limits_{x \in [a, b]} f''(x) \leq f''(\xi_i) \leq \max \limits_{x \in [a, b]} f''(x)
+$$
 
-故有 $$ \min \limits_{x \in [a, b]} f''(x) \leq \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) \leq \max \limits_{x \in [a, b]} f''(x)$$
+故有 
+$$
+\min \limits_{x \in [a, b]} f''(x) \leq \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) \leq \max \limits_{x \in [a, b]} f''(x)
+$$
 
-由中值定理，有 $$\exists \mu \in (a, b), f''(\mu) = \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) $$ 故 $E(f) = \cfrac {h^3}{12} n f''(\mu)$。最终有 $$ \int_{a}^{b} f(x) \text{ d} x = \cfrac h2 \left[ f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i) \right] - \cfrac{h^2}{12} (b - a) f''(\mu)$$
+由中值定理，有 
+$$
+\exists \mu \in (a, b), f''(\mu) = \cfrac 1n \sum \limits_{i = 0}^{n - 1} f''(\xi_i) 
+$$
+故 $E(f) = \cfrac {h^3}{12} n f''(\mu)$。最终有 
+$$
+\int_{a}^{b} f(x) \text{ d} x = \cfrac h2 \left[ f(a) + f(b) + 2 \sum \limits_{i = 1}^{n - 1} f(x_i) \right] - \cfrac{h^2}{12} (b - a) f''(\mu)
+$$
 
 Let $f \in C^2[a, b], h = (b - a) / n$, and $x_j = a + jh$ for each $j = 0, 1, \cdots, n$.
 
 To prove there exists a $\mu \in (a, b)$ for which the Composite trapezoidal rule for $n$ subintervals can be written with its error term as 
+
 $$
 \int_a^b f(x) \text{ d} x = \cfrac h2 [f(a) + 2 \sum \limits_{j = 1}^{n - 1} f(x_j) + f(b)] - \cfrac{b - a}{12} h^2 f''(\mu). 
 $$
@@ -476,16 +500,19 @@ Let $T(f, h) = \cfrac h2 [f(a) + f(b)] + h \sum \limits_{j = 1}^{n - 1} f(x_j)$,
 The key is to prove that there exists $\mu \in (a, b)$, $E_T(f, h)$ can be represented as $\cfrac{- (b - a)}{12} h^2 f''(\mu)$.
 
 First, determine the error term of the formula on $[x_0, x_1]$. Integrate the Lagrange polynomial $P_1(x)$ and its remainder 
+
 $$
 \int_{x_0}^{x_1} f(x) \text{ d} x = \int_{x_0}^{x_1} P_1(x) \text{ d} x + \int_{x_0}^{x_1} \cfrac{(x - x_0) (x - x_1)}{2!} f''(c(x)) \text{ d} x.
 $$
 
-On $[x_0, x_1]$, $(x - x_0)(x - x_1)$ will always be non-positive, and $f''(c(x))$ is continguous on $[x_0, x_1]$. According to \textit{the second mean value theorem of integrals}, there exists $c_1$, 
+On $[x_0, x_1]$, $(x - x_0)(x - x_1)$ will always be non-positive, and $f''(c(x))$ is continguous on $[x_0, x_1]$. According to $\textit{the second mean value theorem of integrals}$, there exists $c_1$, 
+
 $$
     \int_{x_0}^{x_1} f(x) \text{ d} x = \cfrac h2 (f_0 + f_1) + f''(c_1) \int_{x_0}^{x_1} \cfrac{(x - x_0)(x - x_1)}{2!} \text{ d} x.
 $$
 
 Let $x = x_0 + ht$: 
+
 $$
 \begin{aligned}
     \int_{x_0}^{x_1} f(x) \text{ d} x &= \cfrac h2 (f_0 + f_1) + \cfrac{f''(c_1)}{2} \int_{0}^{1} {h(t - 0)h(t - 1)h} \text{ d} t \\
@@ -495,11 +522,13 @@ $$
 $$
 
 Consider 
+
 $$
-\int_a^b f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \int_{x_{k - 1}}^{x_k} f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \cfrac h2 (f(x_{k - 1}) + f(x_k)) - \cfrac{h^3}{12} \sum\limits_{k = 1}^{M} f''(c_k), 
+\int_a^b f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \int_{x_{k - 1}}^{x_k} f(x) \text{ d} x = \sum\limits_{k = 1}^{M} \cfrac h2 (f(x_{k - 1}) + f(x_k)) - \cfrac{h^3}{12} \sum\limits_{k = 1}^{M} f''(c_k),
 $$
 
 The first $\sum$ is $T(f, h)$. For the second $\sum$, let $h = \cfrac{b - a}{M}$, and 
+
 $$
 \int_a^b f(x) \text{ d} x = T(f, h) - \cfrac{(b - a)h^2}{12} \left(\cfrac 1M \sum\limits_{k = 1}^{M} f''(c_k) \right) = T(f, h) - \cfrac{(b - a)h^2}{12} f''(c).
 $$
@@ -511,11 +540,13 @@ $$
 Suppose that we want to approximate $\int_a^b f(x) \text{ d} x$ using \textbf{Composite Trapzoidal Rule} to within a specified tolerance $\varepsilon > 0$.
 
 Let $n = 2$, thus $h_1 = h = (b - a) / 2$. The procedure by \textbf{Composite Trapzoidal Rule} results in the following: 
+
 $$
 \int_a^b f(x) \text{ d} x = \cfrac h2 (f(a) + f(b)) - \cfrac{h^3}{12} f^{(2)}(\mu), \mu \in (a, b).
 $$
 
 Let $n = 4$ and step size $h_2 = (b - a) / 4 = h / 2$ giving 
+
 $$
 \begin{aligned}
 \int_a^b f(x) \text{ d} x &= \cfrac {h_2} 2 \left[ f(a) + 2f(a + h) + f(b) \right] - \cfrac{h^3}{12} f^{(2)}(\mu) \\
@@ -527,6 +558,7 @@ $$
 The error estimation is derived by assuming that $\mu = \overset{\sim}{\mu}$.
 
 Let $T(l, r) = \cfrac h4 [f(l) + f(r)]$, and it can be figured out that 
+
 $$
 T(a, \cfrac{a + b}{2}) + T(\cfrac{a + b}{2}, b) - \cfrac{h^3}{12 \times 4} f^{(2)}(\mu) \approx T(a, b) - \cfrac{h^3}{12} f^{(2)}(\mu).
 $$
@@ -534,17 +566,21 @@ $$
 So 
 $$
 \cfrac{h^3}{12} f^{(2)}(\mu) \approx \cfrac 43 \left[T(a, b) - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right],
-$$ and 
+$$
+
+and
+
 $$
 \left | \int_a^b f(x) \text{ d} x - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right | \approx \cfrac 13 \left[T(a, b) - T(a, \cfrac{a + b}{2}) - T(\cfrac{a + b}{2}, b) \right].
 $$
+
 This result means that $T(a, \cfrac{a + b} 2) + T(\cfrac{a + b} 2, b)$ approximates $\int_a^b f(x)$ about 3 times better than it agrees with the known value $T(a, b)$.
 
 ##### General Case
 
 Let $n$ be even, thus $h_n = (b - a) / n$.
 
-By the \textit{Composite Trapzoidal Rule}, we have 
+By the $\textit{Composite Trapzoidal Rule}$, we have 
 $$
 \int_a^b f(x) \text{ d} x = T(f, h_n) - \cfrac{b - a}{12} h_n^2 f^{(2)}(\mu).
 $$
@@ -555,26 +591,31 @@ $$
 Thus, 
 $$
 \cfrac{b - a}{12} h_n^2 f^{(2)}(\mu) \approx \cfrac 43 \left[ T(f, h_{n}) - T(f, h_{2n}) \right],
-$$ and 
+$$
+and 
 $$
 \int_a^b f(x) \text{ d} x - S_{2n} \approx \cfrac 13 \left[ T(f, h_{n}) - T(f, h_{2n}) \right].
 $$
-
 Thus, for the given required tolerance $\varepsilon$, if $\left| T(f, h_{n}) - T(f, h_{2n}) \right| < 3 \varepsilon$, then we have 
 $$
 \int_a^b f(x) \text{ d} x - S_{2n} < \varepsilon.
 $$
-
 That is $S_{2n}$ be the required accurate numerical approximation to $\int_a^b f(x) \text{ d} x$.
 
 ### Let $h = (b - a) / 3, x_0 = a, x_1 = a + h, x_2 = b$. Find the degree of precision of the quadrature formula $\int_a^b f(x) \text{ d} x = \cfrac 94 hf(x_1) + \cfrac 34 hf(x_2)$.
 
-Let $f(x) = x^m$. When $m = 1$, we have $$ \text{LHS} = \cfrac 12 (b^2 - a^2) \\ \text{RHS} = \cfrac 1{12} (b - a) \left[ 9(\cfrac {b + 2a}{3}) + 3b \right] = \cfrac 12 (b^2 - a^2) \\ \text{LHS} = \text{RHS}$$
-
-When $m = 2$, we have $$ \text{LHS} = \cfrac 13(b^3 - a^3) \\ \text{RHS} = \cfrac{(b - a)(a^2 + ab + b^2)}{3} = \cfrac 13(b^3 - a^3) \\ \text{LHS} = \text{RHS}$$
-
-When $m = 3$, we have $$ \text{LHS} = \cfrac 14(b^4 - a^4) \\ \text{RHS} = \cfrac{-4a^4 - 2a^3b + 3a^2b^2 - 2ab^3 + 5b^4}{18} \\ \text{LHS} \neq \text{RHS} $$
-
+Let $f(x) = x^m$. When $m = 1$, we have
+$$
+\text{LHS} = \cfrac 12 (b^2 - a^2) \\ \text{RHS} = \cfrac 1{12} (b - a) \left[ 9(\cfrac {b + 2a}{3}) + 3b \right] = \cfrac 12 (b^2 - a^2) \\ \text{LHS} = \text{RHS}
+$$
+When $m = 2$, we have
+$$
+\text{LHS} = \cfrac 13(b^3 - a^3) \\ \text{RHS} = \cfrac{(b - a)(a^2 + ab + b^2)}{3} = \cfrac 13(b^3 - a^3) \\ \text{LHS} = \text{RHS}
+$$
+When $m = 3$, we have 
+$$
+\text{LHS} = \cfrac 14(b^4 - a^4) \\ \text{RHS} = \cfrac{-4a^4 - 2a^3b + 3a^2b^2 - 2ab^3 + 5b^4}{18} \\ \text{LHS} \neq \text{RHS}
+$$
 So the degree of precision of the givem quadrature formula is $2$.
 
 ### 自行编制复合梯形公式，Simpson 公式的计算程序，取 $h = 0.01$，计算 $I(f) = \frac{1}{\sqrt{2\pi}} \int_0^1 \exp^{-x^2/2} \text{ d} x$。
@@ -650,7 +691,10 @@ for h in hs:
 
 ### 求 $y' = 1 + y^2$，$y(0) = 0$ 的数值解（分别用欧拉显格式、梯形预估修正格式、4 阶龙格库塔格式，并与解析解比较这三种格式的收敛性。）
 
-首先求方程解析解，有 $$ \begin{aligned} \cfrac{\text{d} y}{\text{d} x} & = 1 + y^2 \\ \cfrac{1}{1 + y^2} \text{ d} y & = \text{d} x \\ \int \cfrac{1}{1 + y^2} \text{ d} y & = \int \text{d} x \\ \arctan (y) + C & = x \end{aligned} $$
+首先求方程解析解，有 
+$$
+\begin{aligned} \cfrac{\text{d} y}{\text{d} x} & = 1 + y^2 \\ \cfrac{1}{1 + y^2} \text{ d} y & = \text{d} x \\ \int \cfrac{1}{1 + y^2} \text{ d} y & = \int \text{d} x \\ \arctan (y) + C & = x \end{aligned}
+$$
 
 又 $y(0) = 0$，有 $C = 0 \Rightarrow y = \tan(x) $。
 
@@ -727,14 +771,12 @@ plt.show()
 ```
 
 ### 用龙格库塔 4 阶方法求解描述振荡器的经典 van der Pol 微分方程，分别取 $\mu = 0.01, 0.1, 1$，作图比较计算结果。
-
 $$
 \begin{cases}
 \cfrac{\text{d}^2 y}{\text{d}t^2} - \mu (1 - y^2) \cfrac{\text{d} y}{\text{d} t} + y = 0 \\
 y(0) = 1, y'(0) = 0
 \end{cases}
 $$
-
 首先将二阶微分方程转化为一阶微分方程组，令 $u_1(t) = \cfrac{\text{d} y}{\text{d} t}, u_2(t) = y(t)$，有 $$\begin{cases}
 u_1' = (\mu (1 - u_2^2) u_1) - u_2 \\
 u_2' = u_1
@@ -787,14 +829,12 @@ plt.show()
 ```
 
 ### 试用 Adams Fourth-Order Predictor-Corrector 格式，求解以下 ODE 的数值解（取 $h = 1, 0.5, 0.25, 0.125$）
-
 $$
 \begin{cases}
 \cfrac{\text{d} y}{\text{d}t} = \cfrac{t - y}{2} \\
 y(0) = 1
 \end{cases}
 $$
-
 首先求解析解。在 Mathematica 中使用 `sol = DSolveValue[{y'[t] == (t - y[t]) / 2, y[0] == 1}, y[t], t]` 求得解析解为 $$y(t) = t - 2 + 3e^{-t / 2} $$
 
 Adams Fourth-Order Predictor-Corrector 格式求解结果如下：
@@ -845,7 +885,6 @@ plt.show()
 ## 第六、七章作业上机实验
 
 ### 求解线性方程组
-
 $$
 \begin{aligned}
 4x - y + z & = 7 \\
@@ -853,12 +892,10 @@ $$
 -2x + y + 5z & = 15
 \end{aligned}
 $$
-
 1. 试用 LU 分解求解此方程组；
 2. 分别用 Jacobi, Gauss-Seidel 方法求解此方程组。
 
 LU 分解得到的矩阵如下：
-
 $$
 L = \begin{bmatrix}
 1 & 0 & 0 \\
@@ -871,7 +908,6 @@ R = \begin{bmatrix}
 0 & 0 & 5.5
 \end{bmatrix}
 $$
-
 在 tolerance 在 $10^{-6}$ 的情况下，求解结果如下：
 
 ```plain
@@ -962,7 +998,6 @@ E &= \sum \limits_{i = 1}^{m} [y_i - P(x_i)]^2 \\
 求偏导数得 $$\cfrac{\partial E}{\partial a_j} = -2 \sum \limits_{i = 1}^{m} y_i x_i^j + 2 \sum \limits_{k = 0}^{2} a_k \sum \limits_{i = 1}^{m} x_i^{j + k}, \quad j = 0, 1, 2$$
 
 若使误差最小，则应有偏导数为 $0$，得到下面的正则方程组：
-
 $$
 \begin{cases}
 a_0 \sum x_i^0 + a_1 \sum x_i^1 + a_2 \sum x_i^2 = \sum y_i x_i^0 \\
@@ -970,7 +1005,6 @@ a_0 \sum x_i^1 + a_1 \sum x_i^2 + a_2 \sum x_i^3 = \sum y_i x_i^1 \\
 a_0 \sum x_i^2 + a_1 \sum x_i^3 + a_2 \sum x_i^4 = \sum y_i x_i^2 
 \end{cases}
 $$
-
 于是解线性方程组即可。解得 $a_0 = 1.65714286, a_1 = 0, a_2 = -0.42857143$，故 $$P(x) = -0.4286 x^2 + 1.6571$$
 
 Python 求解代码如下：
@@ -1008,7 +1042,6 @@ print(a)
 ## 第九章作业上机实验
 
 ### 已知矩阵 $\mathbf{A}$ 是一个对称矩阵，且其特征值为 $\lambda_1 = 6, \lambda_2 = 3, \lambda_3 = 1$，分别利用幂法、对称幂法、反幂法求其最大特征值和特征向量。
-
 $$
 A = \begin{bmatrix}
 4 & -1 & 1 \\
@@ -1016,7 +1049,6 @@ A = \begin{bmatrix}
 1 & -2 & 3
 \end{bmatrix}
 $$
-
 #### 幂法
 
 其基于 $$\lim \limits_{k \to \infty} \mathbf{A}^k \mathbf{x} = \lim \limits_{k \to \infty} \lambda_1^k \beta_1 \mathbf{v}^{(1)}$$ 其中 $\lambda_1$ 是主特征值，$\mathbf{x} = \sum \beta_j \mathbf{v}^j$。
@@ -1031,7 +1063,7 @@ $$
 
 可在迭代向量规范化时使用 2 范数，加快收敛。
 
-### 反幂法
+#### 反幂法
 
 对矩阵 $\mathbf{A}^{-1}$ 用幂法，即可计算最大特征值 $1 / \lambda_n$，即可计算 $\mathbf{A}$ 的最小特征值 $\lambda_n$。
 
@@ -1050,7 +1082,6 @@ inverse_power_method: got lambda = 6.000000006191799, X = [ 1.99999998 -1.999999
 注意到反幂法在 $\alpha$ 取值适当的情况下收敛速度显著更快。
 
 ### 分别利用 Householder 变换和 Givens 旋转变换方法求 $\mathbf{A}$ 的 QR 分解。
-
 $$
 \mathbf{A} = \begin{bmatrix}
 1 & 0 & 0 \\
@@ -1059,7 +1090,6 @@ $$
 1 & 1 & 1
 \end{bmatrix}
 $$
-
 #### Householder 变换
 
 Householder 目标为使得一个矩阵 $\mathbf{H}$ 将一个向量的，除了一个维度以外的其他所有分量，全部转化为 $0$。
@@ -1073,7 +1103,6 @@ Householder 目标为使得一个矩阵 $\mathbf{H}$ 将一个向量的，除了
     解得 $||x|| = 2$，故有 $$ \mathbf{u} = \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} - 2 \begin{bmatrix} 1 \\ 0 \\ 0 \\ 0 \end{bmatrix} = \begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} $$ 归一化 $ \mathbf{u} $ 得到 $ \mathbf{v} = \frac{\mathbf{u}}{\|\mathbf{u}\|} $。注意到 $ \mathbf{u} $ 的二范数 $ \|\mathbf{u}\| = 2 $，所以 $$ \mathbf{v} = \cfrac{1}{2}\begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} $$
 
     Householder 矩阵 $ \mathbf{H_1} = I - 2 \mathbf{v} \mathbf{v}^T $:
-
     $$
     \mathbf{v} \mathbf{v}^T = \frac{1}{4} \begin{bmatrix} -1 \\ 1 \\ 1 \\ 1 \end{bmatrix} \begin{bmatrix} -1 & 1 & 1 & 1 \end{bmatrix} = \frac{1}{4} \begin{bmatrix} 1 & -1 & -1 & -1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \\ -1 & 1 & 1 & 1 \end{bmatrix}
     $$
@@ -1083,7 +1112,7 @@ Householder 目标为使得一个矩阵 $\mathbf{H}$ 将一个向量的，除了
     $$
 
     计算 $ \mathbf{H_1} \mathbf{A} $:
-
+    
     $$
     \mathbf{H_1} \mathbf{A} = \begin{bmatrix} \frac{1}{2} & \frac{1}{2} & \frac{1}{2} & \frac{1}{2} \\ \frac{1}{2} & \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & \frac{1}{2} & -\frac{1}{2} \\ \frac{1}{2} & -\frac{1}{2} & -\frac{1}{2} & \frac{1}{2} \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 0 & -1 \end{bmatrix}
     $$
